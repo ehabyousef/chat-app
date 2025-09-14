@@ -13,7 +13,7 @@ export const userRouter = express.Router();
 
 userRouter.get("/", protectRoute, getgetUsersForSidebar);
 userRouter.get("/:id", protectRoute, getgetUsersForSidebar);
-authRouter.put(
+userRouter.put(
   "/update-profile",
   authorizedRoute,
   Validator(updateProfile),
