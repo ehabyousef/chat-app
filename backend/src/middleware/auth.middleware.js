@@ -25,7 +25,7 @@ export const protectRoute = async (req, res, next) => {
 
 export const authorizedRoute = async (req, res, next) => {
   protectRoute(req, res, () => {
-    if (req.user.id !== req.params.id) {
+    if (req.user._id.toString() !== req.params.id.toString()) {
       res.status(403).json({ message: "you are not authorized " });
     } else {
       next();

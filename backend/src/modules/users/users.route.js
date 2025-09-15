@@ -14,7 +14,7 @@ export const userRouter = express.Router();
 userRouter.get("/", protectRoute, getgetUsersForSidebar);
 userRouter.get("/:id", protectRoute, getgetUsersForSidebar);
 userRouter.put(
-  "/update-profile",
+  "/update-profile/:id",
   authorizedRoute,
   Validator(updateProfile),
   updateUserProfile

@@ -8,4 +8,4 @@ export const authRouter = express.Router();
 authRouter.post("/register", Validator(registervalidation), register);
 authRouter.post("/login", Validator(loginvalidation), login);
 authRouter.post("/logout", logout);
-authRouter.post("/check", protectRoute, checkAuth);
+authRouter.get("/check", protectRoute, checkAuth);

@@ -21,8 +21,9 @@ app.use(
   })
 );
 app.use(cookieParser());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Increase JSON/urlencoded limits (still useful for non-file routes)
+app.use(express.json({ limit: "25mb" }));
+app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 app.use(express.static(path.join(__dirname, "../images")));
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);

@@ -10,12 +10,18 @@ export const updateUserProfile = async (req, res) => {
       res.status(404).json({ message: "user not found" });
     }
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+    let imageUrl = user.profilePic;
+    if (profilePic) {
+      const uploadResponse = await cloudinary.uploader.upload(profilePic, {
+        folder: "profile_pictures",
+      });
+      imageUrl = uploadResponse.secure_url;
+    }
 
     const updateuser = await User.findByIdAndUpdate(
       userId,
       {
-        profilePic: uploadResponse.secure_url,
+        profilePic: imageUrl,
         fullName,
         email,
       },
