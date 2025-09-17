@@ -1,5 +1,8 @@
 import AuthImagePattern from "@/components/AuthImagePattern";
 import { useAuthStore } from "@/store/useAuthStore";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Eye,
   EyeOff,
@@ -43,12 +46,11 @@ function SignUp() {
   };
 
   return (
-    <div className="min-h-screen w-screen grid lg:grid-cols-2">
+    <div className="min-h-[calc(100vh-4rem)] w-screen grid lg:grid-cols-2 bg-background">
       {/* left side */}
       <div className="flex flex-col justify-center items-center p-6 sm:p-12">
-        <div className="w-full max-w-md space-y-8">
-          {/* LOGO */}
-          <div className="text-center mb-8">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center space-y-4">
             <div className="flex flex-col items-center gap-2 group">
               <div
                 className="size-12 rounded-xl bg-primary/10 flex items-center justify-center 
@@ -56,104 +58,103 @@ function SignUp() {
               >
                 <MessageSquare className="size-6 text-primary" />
               </div>
-              <h1 className="text-2xl font-bold mt-2">Create Account</h1>
-              <p className="text-base-content/60">
+              <h1 className="text-2xl font-bold mt-2 text-foreground">
+                Create Account
+              </h1>
+              <p className="text-muted-foreground">
                 Get started with your free account
               </p>
             </div>
-          </div>
+          </CardHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Full Name</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="size-5 text-base-content/40" />
+          <CardContent className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="size-4 text-muted-foreground" />
+                  </div>
+                  <Input
+                    type="text"
+                    className="pl-10"
+                    placeholder="John Doe"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                  />
                 </div>
-                <input
-                  type="text"
-                  className={`input input-bordered w-full pl-10`}
-                  placeholder="John Doe"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                />
               </div>
-            </div>
 
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Email</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="size-5 text-base-content/40" />
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  Email
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="size-4 text-muted-foreground" />
+                  </div>
+                  <Input
+                    type="email"
+                    name="email"
+                    className="pl-10"
+                    placeholder="you@example.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
                 </div>
-                <input
-                  type="email"
-                  name="email"
-                  className={`input input-bordered w-full pl-10`}
-                  placeholder="you@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                />
               </div>
-            </div>
 
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Password</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="size-5 text-base-content/40" />
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="size-4 text-muted-foreground" />
+                  </div>
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    className="pl-10 pr-10"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="size-4 text-muted-foreground hover:text-foreground cursor-pointer" />
+                    ) : (
+                      <Eye className="size-4 text-muted-foreground hover:text-foreground cursor-pointer" />
+                    )}
+                  </button>
                 </div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  className={`input input-bordered w-full pl-10`}
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="size-5 text-base-content/40" />
-                  ) : (
-                    <Eye className="size-5 text-base-content/40" />
-                  )}
-                </button>
               </div>
+
+              <Button type="submit" className="w-full" disabled={isSigningUp}>
+                {isSigningUp ? (
+                  <Loader2 className="size-4 animate-spin mr-2" />
+                ) : null}
+                {isSigningUp ? "Creating Account..." : "Create Account"}
+              </Button>
+            </form>
+
+            <div className="text-center">
+              <p className="text-muted-foreground text-sm">
+                Already have an account?{" "}
+                <Link to="/login" className="text-primary hover:underline">
+                  Sign in
+                </Link>
+              </p>
             </div>
-
-            <button
-              type="submit"
-              className="btn btn-primary w-full cursor-pointer"
-              disabled={isSigningUp}
-            >
-              {isSigningUp ? (
-                <Loader2 className="size-5 animate-spin w-full" />
-              ) : (
-                "Create Account"
-              )}
-            </button>
-          </form>
-
-          <div className="text-center">
-            <p className="text-base-content/60">
-              Already have an account?{" "}
-              <Link to="/login" className="link link-primary">
-                Sign in
-              </Link>
-            </p>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* right side */}

@@ -3,7 +3,6 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
-import Settings from "./pages/Settings";
 import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
@@ -20,33 +19,34 @@ function App() {
 
   if (isCheckingAuth && !authUser) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin size-10" />
+      <div className="h-screen flex items-center justify-center bg-background text-foreground">
+        <Loader2 className="animate-spin size-10 text-muted-foreground" />
       </div>
     );
   }
   return (
-    <div className="bg-zinc-950">
+    <div className="min-h-screen bg-background text-foreground transition-colors">
       <Navbar />
-      <Routes>
-        <Route
-          path="/"
-          element={authUser ? <Home /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/login"
-          element={!authUser ? <Login /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/signup"
-          element={!authUser ? <SignUp /> : <Navigate to="/" />}
-        />
-        <Route path="/settings" element={<Settings />} />
-        <Route
-          path="/profile"
-          element={authUser ? <Profile /> : <Navigate to="/login" />}
-        />
-      </Routes>
+      <main className="pt-16">
+        <Routes>
+          <Route
+            path="/"
+            element={authUser ? <Home /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/login"
+            element={!authUser ? <Login /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/signup"
+            element={!authUser ? <SignUp /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/profile"
+            element={authUser ? <Profile /> : <Navigate to="/login" />}
+          />
+        </Routes>
+      </main>
       <Toaster />
     </div>
   );
