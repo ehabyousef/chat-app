@@ -5,17 +5,18 @@ import {
   protectRoute,
 } from "../../middleware/auth.middleware.js";
 import {
-  getgetUsersForSidebar,
+  getSingleuser,
+  getUsersForSidebar,
   updateUserProfile,
 } from "./users.controller.js";
-import { updateProfile } from "./user.validation.js";
+import { updateProfileValidation } from "./users.validation.js";
 export const userRouter = express.Router();
 
-userRouter.get("/", protectRoute, getgetUsersForSidebar);
-userRouter.get("/:id", protectRoute, getgetUsersForSidebar);
+userRouter.get("/friends", protectRoute, getUsersForSidebar);
+userRouter.get("/:id", protectRoute, getSingleuser);
 userRouter.put(
   "/update-profile/:id",
   authorizedRoute,
-  Validator(updateProfile),
+  Validator(updateProfileValidation),
   updateUserProfile
 );

@@ -25,6 +25,7 @@ export const register = async (req, res) => {
         email: newUser.email,
         fullName: newUser.fullName,
         profilePic: newUser.profilePic,
+        _id: newUser._id,
       });
     }
   } catch (error) {
@@ -50,6 +51,7 @@ export const login = async (req, res) => {
       fullName: user.fullName,
       email: user.email,
       profilePic: user.profilePic,
+      _id: user._id,
     });
   } catch (error) {
     console.error(`error in signup controller:`, error);
@@ -68,7 +70,12 @@ export const logout = async (req, res) => {
 
 export const checkAuth = async (req, res) => {
   try {
-    res.status(200).json(req.user);
+    const user = req.user;
+    if (user) {
+      res.status(200).json(req.user);
+    } else {
+      res.status(401).json({ message: "not authorized" });
+    }
   } catch {
     res.status(500).json({ message: "internal server error" });
   }

@@ -26,14 +26,14 @@ export const updateUserProfile = async (req, res) => {
         email,
       },
       { new: true }
-    );
+    ).select("_id fullName email profilePic");
 
     res.status(200).json(updateuser);
   } catch (error) {}
   res.status(500).json({ message: "internal server error" });
 };
 
-export const getgetUsersForSidebar = async (req, res) => {
+export const getUsersForSidebar = async (req, res) => {
   try {
     const userId = req.user._id;
     const filteredUsers = await User.find({ _id: { $ne: userId } }).select(

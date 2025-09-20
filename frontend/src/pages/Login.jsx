@@ -14,7 +14,7 @@ function Login() {
     email: "",
     password: "",
   });
-  console.log("🚀 ~ Login ~ formData:", formData);
+
   const { login, islogingin } = useAuthStore();
 
   const validateForm = () => {

@@ -1,18 +1,17 @@
 import { useAuthStore } from "@/store/useAuthStore";
-import { Camera, Eye, EyeOff, Loader2, Lock, Mail, User } from "lucide-react";
+import { Camera, Loader2, Mail, User } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
 function Profile() {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
-  console.log("🚀 ~ Profile ~ authUser:", authUser);
+
   const [selectedImg, setselectedImg] = useState(null);
   const [formData, setformData] = useState({
     fullName: authUser.fullName || "",
     email: authUser.email || "",
     profilePic: authUser.profilePic || "",
   });
-  console.log("🚀 ~ Profile ~ formData:", formData);
   const handleImageUpload = async (e) => {
     e.preventDefault();
     const file = e.target.files[0];
@@ -119,7 +118,7 @@ function Profile() {
                 <input
                   type="fullName"
                   name="fullName"
-                  className={`input input-bordered w-full pl-10`}
+                  className={`input input-bordered w-full py-2 pl-10`}
                   placeholder="ehab yousef"
                   value={formData.fullName}
                   onChange={handleChange}
@@ -137,7 +136,7 @@ function Profile() {
                 <input
                   type="email"
                   name="email"
-                  className={`input input-bordered w-full pl-10`}
+                  className={`input input-bordered w-full py-2 pl-10`}
                   placeholder="you@example.com"
                   value={formData.email}
                   onChange={handleChange}
@@ -147,7 +146,7 @@ function Profile() {
 
             <button
               type="submit"
-              className="btn btn-primary w-full cursor-pointer"
+              className="btn btn-primary border-2 rounded-lg w-auto p-2 px-5 cursor-pointer"
               disabled={isUpdatingProfile}
             >
               {isUpdatingProfile ? (

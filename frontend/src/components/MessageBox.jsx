@@ -1,0 +1,127 @@
+import { useMessageStore } from "@/store/useMessagesStore";
+import { useEffect } from "react";
+import ChatHeader from "./ChatHeader";
+import { MessageSkeleton } from "./MessageSkeleton";
+import MessageInput from "./MessageInput";
+import { useAuthStore } from "@/store/useAuthStore";
+
+function MessageBox({ open, selectedUser }) {
+  const { isLoadingMessages, messages, getMessages } = useMessageStore();
+  const { authUser } = useAuthStore();
+  useEffect(() => {
+    if (selectedUser?._id) {
+      getMessages(selectedUser._id);
+    }
+  }, [getMessages, selectedUser]);
+
+  if (isLoadingMessages)
+    return (
+      <div
+        className={`h-[calc(100vh-92px)] w-screen ${
+          open ? "md:w-[calc(100vw-256px)]" : "md:w-screen"
+        } transition-all duration-300`}
+      >
+        <div className="flex flex-col h-full">
+          <ChatHeader selectedUser={selectedUser} />
+          <div className="flex-1 overflow-hidden">
+            <MessageSkeleton />
+          </div>
+          <MessageInput />
+        </div>
+      </div>
+    );
+
+  return (
+    <div
+      className={`h-[calc(100vh-92px)] w-screen ${
+        open ? "md:w-[calc(100vw-256px)]" : "md:w-screen"
+      } transition-all duration-300`}
+    >
+      {!selectedUser || Object.keys(selectedUser).length === 0 ? (
+        <div className="h-full flex flex-col gap-3 items-center justify-center">
+          <h3 className="text-3xl fw-bolder text-primary">welcome to chatty</h3>
+          <p>select conversation to start chatting</p>
+        </div>
+      ) : (
+        <div className="flex flex-col h-full">
+          <ChatHeader selectedUser={selectedUser} />
+          <div className="flex-1 overflow-hidden">
+            <div className="h-full overflow-y-auto p-4 space-y-4">
+              {messages.map((msg) => {
+                // Debug the comparison
+                console.log("Message comparison:", {
+                  msgSenderId: msg.senderId,
+                  authUserId: authUser._id,
+                  isEqual: msg.senderId === authUser._id,
+                  msgType: typeof msg.senderId,
+                  authType: typeof authUser._id,
+                  stringCompare: String(msg.senderId) === String(authUser._id),
+                });
+
+                // Convert to string for consistent comparison
+                const isMyMessage =
+                  String(msg.senderId) === String(authUser._id);
+
+                return (
+                  <div
+                    key={msg._id}
+                    className={`flex w-full ${
+                      isMyMessage ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <div
+                      className={`flex items-center space-x-4 max-w-[70%] ${
+                        isMyMessage ? "flex-row-reverse space-x-reverse" : ""
+                      }`}
+                    >
+                      <div className="size-10 flex shrink-0">
+                        <img
+                          className="rounded-lg"
+                          src={
+                            isMyMessage
+                              ? authUser.profilePic || "../../public/avatar.jpg"
+                              : selectedUser.profilePic ||
+                                "../../public/avatar.jpg"
+                          }
+                          alt="avatar"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <time
+                          className={`w-full text-xs flex ${
+                            isMyMessage ? "justify-end" : "justify-start"
+                          }`}
+                        >
+                          {new Date(msg?.createdAt).toLocaleTimeString()}
+                        </time>
+                        <div className={`w-full flex flex-col gap-4 `}>
+                          {msg?.image && (
+                            <div
+                              className={`size-48 flex shrink-0 ${
+                                isMyMessage ? "ml-auto" : "ml-0"
+                              }`}
+                            >
+                              <img
+                                src={msg.image}
+                                alt="message image"
+                                className="w-full h-full rounded-xl"
+                              />
+                            </div>
+                          )}
+                          {msg?.text && <div>{msg.text}</div>}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <MessageInput />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default MessageBox;
