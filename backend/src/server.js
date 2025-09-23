@@ -1,10 +1,16 @@
 import dotenv from "dotenv";
 import { connectDB } from "./DB/connection.js";
 import app from "./index.js";
+import { createServer } from "http";
+import { initSocket } from "./utils/socket.js";
 
 dotenv.config();
 
 const PORT = process.env.PORT;
+
+const httpServer = createServer(app);
+initSocket(httpServer);
+
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
