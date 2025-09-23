@@ -13,7 +13,7 @@ initSocket(httpServer);
 
 connectDB()
   .then(() => {
-    app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
       console.log(`app server started at port ${PORT}`);
     });
   })

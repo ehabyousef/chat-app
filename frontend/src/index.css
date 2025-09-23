@@ -218,3 +218,12 @@ input:focus-visible {
 button:disabled {
   cursor: not-allowed;
 }
+
+::-webkit-scrollbar {
+  background-color: transparent;
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--primary);
+  border-radius: 6px;
+}

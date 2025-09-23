@@ -1,8 +1,12 @@
+import { useAuthStore } from "@/store/useAuthStore";
 import { useMessageStore } from "@/store/useMessagesStore";
 import { X } from "lucide-react";
 
 function ChatHeader({ selectedUser }) {
   const { nullSelectedUser } = useMessageStore();
+  const { onlineUsers } = useAuthStore();
+
+  const online = onlineUsers.some((x) => x === selectedUser._id);
 
   return (
     <div className="pl-4 bg-card w-full h-16 flex justify-between items-center">
@@ -14,7 +18,7 @@ function ChatHeader({ selectedUser }) {
         />
         <div className="flex flex-col items-start justify-between">
           <p className="text-primary">{selectedUser.fullName}</p>
-          <p>offline</p>
+          <p>{online ? "online" : "offline"}</p>
         </div>
       </div>
       <div onClick={() => nullSelectedUser()} className="pr-4 cursor-pointer">

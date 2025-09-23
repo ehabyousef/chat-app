@@ -1,5 +1,5 @@
 import { useMessageStore } from "@/store/useMessagesStore";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import ChatHeader from "./ChatHeader";
 import { MessageSkeleton } from "./MessageSkeleton";
 import MessageInput from "./MessageInput";
@@ -7,14 +7,25 @@ import { useAuthStore } from "@/store/useAuthStore";
 
 function MessageBox({ open, selectedUser }) {
   const { isLoadingMessages, messages, getMessages } = useMessageStore();
+  console.log("🚀 ~ MessageBox ~ isLoadingMessages:", isLoadingMessages);
   const { authUser } = useAuthStore();
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   useEffect(() => {
     if (selectedUser?._id) {
       getMessages(selectedUser._id);
     }
   }, [getMessages, selectedUser]);
 
-  if (isLoadingMessages)
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  if (isLoadingMessages || messages.length === 0)
     return (
       <div
         className={`h-[calc(100vh-92px)] w-screen ${
@@ -48,16 +59,6 @@ function MessageBox({ open, selectedUser }) {
           <div className="flex-1 overflow-hidden">
             <div className="h-full overflow-y-auto p-4 space-y-4">
               {messages.map((msg) => {
-                // Debug the comparison
-                console.log("Message comparison:", {
-                  msgSenderId: msg.senderId,
-                  authUserId: authUser._id,
-                  isEqual: msg.senderId === authUser._id,
-                  msgType: typeof msg.senderId,
-                  authType: typeof authUser._id,
-                  stringCompare: String(msg.senderId) === String(authUser._id),
-                });
-
                 // Convert to string for consistent comparison
                 const isMyMessage =
                   String(msg.senderId) === String(authUser._id);
@@ -115,6 +116,7 @@ function MessageBox({ open, selectedUser }) {
                   </div>
                 );
               })}
+              <div ref={messagesEndRef} />
             </div>
           </div>
           <MessageInput />

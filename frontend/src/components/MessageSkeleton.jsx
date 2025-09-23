@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-const skeletonMessages = Array(9).fill(null);
+const skeletonMessages = Array(10).fill(null);
 export function MessageSkeleton() {
   return (
     <div className="h-full overflow-y-auto p-4 space-y-4">

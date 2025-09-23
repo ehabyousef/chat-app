@@ -79,9 +79,10 @@ export const useAuthStore = create((set, get) => ({
       set({ isUpdatingProfile: false });
     }
   },
+
   connectSocket: () => {
     const { authUser } = get();
-    if (!authUser || get().socket?.connect) return;
+    if (!authUser || get().socket?.connected) return;
 
     const socket = io(BASE_URL, {
       query: {
@@ -96,6 +97,6 @@ export const useAuthStore = create((set, get) => ({
     });
   },
   disconnectSocket: () => {
-    if (get().socket.connect) get().socket.disconnect();
+    if (get().socket?.connected) get().socket.disconnect();
   },
 }));
