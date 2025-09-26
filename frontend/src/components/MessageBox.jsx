@@ -4,11 +4,19 @@ import ChatHeader from "./ChatHeader";
 import { MessageSkeleton } from "./MessageSkeleton";
 import MessageInput from "./MessageInput";
 import { useAuthStore } from "@/store/useAuthStore";
+import { MessageSquare } from "lucide-react";
 
 function MessageBox({ open, selectedUser }) {
-  const { isLoadingMessages, messages, getMessages } = useMessageStore();
-  console.log("🚀 ~ MessageBox ~ isLoadingMessages:", isLoadingMessages);
+  const {
+    isLoadingMessages,
+    messages,
+    getMessages,
+    subscripeToMessage,
+    unSubscripeFromMessage,
+  } = useMessageStore();
+
   const { authUser } = useAuthStore();
+
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -18,14 +26,17 @@ function MessageBox({ open, selectedUser }) {
   useEffect(() => {
     if (selectedUser?._id) {
       getMessages(selectedUser._id);
+
+      subscripeToMessage();
+      return () => unSubscripeFromMessage();
     }
-  }, [getMessages, selectedUser]);
+  }, [getMessages, selectedUser, subscripeToMessage, unSubscripeFromMessage]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  if (isLoadingMessages || messages.length === 0)
+  if (isLoadingMessages && messages.length === 0)
     return (
       <div
         className={`h-[calc(100vh-92px)] w-screen ${
@@ -50,8 +61,13 @@ function MessageBox({ open, selectedUser }) {
     >
       {!selectedUser || Object.keys(selectedUser).length === 0 ? (
         <div className="h-full flex flex-col gap-3 items-center justify-center">
+          <div className="size-16 rounded-lg bg-primary/10 flex items-center justify-center">
+            <MessageSquare className="size-8 text-primary animate-bounce" />
+          </div>
           <h3 className="text-3xl fw-bolder text-primary">welcome to chatty</h3>
-          <p>select conversation to start chatting</p>
+          <p className="text-foreground">
+            select conversation to start chatting
+          </p>
         </div>
       ) : (
         <div className="flex flex-col h-full">

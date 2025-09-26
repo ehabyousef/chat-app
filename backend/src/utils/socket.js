@@ -1,15 +1,23 @@
 import { Server } from "socket.io";
 
-export const initSocket = (server) => {
-  const io = new Server(server, {
+// used to store online users
+const userSocketMap = {}; // {userId: socketId}
+
+// Will store the Socket.IO server instance
+let io;
+
+// Function to get the receiver's socket ID by userId
+function getReciverSocketId(userId) {
+  return userSocketMap[userId];
+}
+
+const initSocket = (server) => {
+  io = new Server(server, {
     cors: {
       origin: "http://localhost:5173",
       credentials: true,
     },
   });
-
-  // used to store online users
-  const userSocketMap = {}; // {userId: socketId}
 
   io.on("connection", (socket) => {
     console.log("user connected", socket.id);
@@ -23,4 +31,8 @@ export const initSocket = (server) => {
       io.emit("getOnlineUsers", Object.keys(userSocketMap));
     });
   });
+
+  return io;
 };
+
+export { initSocket, getReciverSocketId, io };

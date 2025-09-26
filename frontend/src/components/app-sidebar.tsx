@@ -1,5 +1,3 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
-
 import {
   Sidebar,
   SidebarContent,
@@ -40,6 +38,7 @@ export function AppSidebar() {
                     <div className="w-1/2 h-full relative">
                       <img
                         src={user?.profilePic}
+                        alt="avatar"
                         className="object-cover h-full w-1/2 rounded-xl"
                       />
                       {onlineUsers.includes(user._id) && (
