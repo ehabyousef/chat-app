@@ -105,13 +105,15 @@ function MessageBox({ open, selectedUser }) {
                       </div>
                       <div className="space-y-2">
                         <time
-                          className={`w-full text-xs flex ${
+                          className={`w-full text-xs flex text-primary ${
                             isMyMessage ? "justify-end" : "justify-start"
                           }`}
                         >
                           {new Date(msg?.createdAt).toLocaleTimeString()}
                         </time>
-                        <div className={`w-full flex flex-col gap-4 `}>
+                        <div
+                          className={`w-full flex flex-col gap-4 p-1 rounded-md bg-muted text-foreground`}
+                        >
                           {msg?.image && (
                             <div
                               className={`size-48 flex shrink-0 ${

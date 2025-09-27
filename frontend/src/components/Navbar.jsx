@@ -3,6 +3,8 @@ import { useAuthStore } from "../store/useAuthStore";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LogOut, MessageSquare, Settings, User } from "lucide-react";
+import { Input } from "./ui/input";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const Navbar = () => {
   const { logout, authUser } = useAuthStore();
@@ -25,7 +27,22 @@ const Navbar = () => {
               <h1 className="text-lg font-bold text-foreground">Chatty</h1>
             </Link>
           </div>
-
+          <div className="w-xl relative">
+            <Input type="text" placeholder="search by First Name" />
+            <div className="absolute flex flex-col space-y-2 -bottom-32 w-full h-32 overflow-y-auto bg-accent-foreground text-background p-2 rounded-lg">
+              <div className="flex w-full justify-between items-center">
+                <p>mohamed diaa</p>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="secondary">follow</Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>add to friends</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </div>
+          </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
 
