@@ -1,5 +1,17 @@
 import mongoose from "mongoose";
 
+const friendSchema = new mongoose.Schema(
+  {
+    friendId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    addedAt: { type: Date, default: Date.now() },
+  },
+  { _id: false }
+);
+
 const userSchema = new mongoose.Schema(
   {
     fullName: {
@@ -22,6 +34,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    friends: [friendSchema],
   },
   { timestamps: true }
 );

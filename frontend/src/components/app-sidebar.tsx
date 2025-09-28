@@ -15,12 +15,13 @@ import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 
 export function AppSidebar() {
-  const { getUsers, users, setSelectedUser, selectedUser } = useMessageStore();
+  const { getFriends, users, setSelectedUser, selectedUser } =
+    useMessageStore();
   const { onlineUsers } = useAuthStore();
   const [showOnline, setshowOnline] = useState(false);
   useEffect(() => {
-    getUsers();
-  }, [getUsers]);
+    getFriends();
+  }, [getFriends]);
 
   const filterUsers = showOnline
     ? users.filter((user) => onlineUsers.includes(user._id))
@@ -65,6 +66,11 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {filterUsers.length === 0 && (
+                <div className="text-center text-muted-foreground py-4">
+                  no users to show
+                </div>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

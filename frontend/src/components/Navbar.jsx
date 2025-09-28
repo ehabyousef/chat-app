@@ -5,9 +5,25 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LogOut, MessageSquare, Settings, User } from "lucide-react";
 import { Input } from "./ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { useRef, useState } from "react";
 
 const Navbar = () => {
-  const { logout, authUser } = useAuthStore();
+  const { logout, authUser, searchUsers, usersFollow, searching, addFriend } =
+    useAuthStore();
+  const [query, setquery] = useState("");
+  const [open, setopen] = useState(false);
+  const debRef = useRef();
+
+  const handleChange = (e) => {
+    const val = e.target.value;
+    setquery(val);
+    setopen(Boolean(val.trim()));
+    if (debRef.current) clearTimeout(debRef.current);
+
+    debRef.current = setTimeout(() => {
+      if (val.trim()) searchUsers(val.trim());
+    }, 300);
+  };
 
   return (
     <header
@@ -27,21 +43,49 @@ const Navbar = () => {
               <h1 className="text-lg font-bold text-foreground">Chatty</h1>
             </Link>
           </div>
-          <div className="w-xl relative">
-            <Input type="text" placeholder="search by First Name" />
-            <div className="absolute flex flex-col space-y-2 -bottom-32 w-full h-32 overflow-y-auto bg-accent-foreground text-background p-2 rounded-lg">
-              <div className="flex w-full justify-between items-center">
-                <p>mohamed diaa</p>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="secondary">follow</Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>add to friends</p>
-                  </TooltipContent>
-                </Tooltip>
+          <div className="md:w-sm lg:w-xl relative">
+            <Input
+              value={query}
+              onChange={handleChange}
+              type="text"
+              placeholder="search by First Name"
+            />
+            {open && (
+              <div className="absolute flex flex-col space-y-2 -bottom-32 w-full h-32 overflow-y-auto bg-muted-foreground text-forground p-2 rounded-lg">
+                {searching ? (
+                  <div className="text-sm text-muted-foreground p-2">
+                    Searching…
+                  </div>
+                ) : usersFollow.length === 0 ? (
+                  <div className="text-sm text-muted-foreground p-2">
+                    No users found
+                  </div>
+                ) : (
+                  <>
+                    {usersFollow.map((u) => (
+                      <div className="flex w-full justify-between items-center">
+                        <p>{u.fullName}</p>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              onClick={() => {
+                                addFriend(u._id);
+                              }}
+                              variant="secondary"
+                            >
+                              follow
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>add to friends</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    ))}
+                  </>
+                )}
               </div>
-            </div>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />

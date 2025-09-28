@@ -10,7 +10,8 @@ export const useMessageStore = create((set, get) => ({
   isLoadingUsers: false,
   isLoadingMessages: false,
   isSendingMessages: false,
-  getUsers: async () => {
+
+  getFriends: async () => {
     set({ isLoadingUsers: true });
     try {
       const res = await axiosInstance.get("/users/friends");
@@ -21,6 +22,7 @@ export const useMessageStore = create((set, get) => ({
       set({ isLoadingUsers: false });
     }
   },
+
   getMessages: async (userId) => {
     set({ isLoadingMessages: true });
     try {

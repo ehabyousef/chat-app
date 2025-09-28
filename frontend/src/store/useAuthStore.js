@@ -2,6 +2,7 @@ import { axiosInstance } from "@/lib/axios";
 import toast from "react-hot-toast";
 import { create } from "zustand";
 import { io } from "socket.io-client";
+import { useMessageStore } from "./useMessagesStore";
 
 const BASE_URL = "http://localhost:5001";
 export const useAuthStore = create((set, get) => ({
@@ -12,6 +13,8 @@ export const useAuthStore = create((set, get) => ({
   isUpdatingProfile: false,
   onlineUsers: [],
   socket: null,
+  usersFollow: [],
+  searching: false,
 
   checkAuth: async () => {
     try {
@@ -80,6 +83,35 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  searchUsers: async (search) => {
+    try {
+      set({ searching: true });
+      const res = await axiosInstance.get(`/users/appUsers`, {
+        params: { search },
+      });
+      set({ usersFollow: res.data });
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      set({ searching: false });
+    }
+  },
+
+  addFriend: async (id) => {
+    try {
+      await axiosInstance.put(`/users/addFriend`, { friendId: id });
+      toast.success("added to friends");
+      const { getFriends } = useMessageStore.getState();
+      getFriends();
+
+      set((state) => ({
+        usersFollow: state.usersFollow.filter((x) => x._id !== id),
+      }));
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  },
+
   connectSocket: () => {
     const { authUser } = get();
     if (!authUser || get().socket?.connected) return;
@@ -96,6 +128,7 @@ export const useAuthStore = create((set, get) => ({
       set({ onlineUsers: userIds });
     });
   },
+
   disconnectSocket: () => {
     if (get().socket?.connected) get().socket.disconnect();
   },

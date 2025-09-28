@@ -23,7 +23,7 @@ export default function MessageInput() {
 
   const submitMessage = async (e) => {
     e.preventDefault();
-    if (!text.trim() && !imagePreview) return; // Only block if both are empty
+    if (!text.trim() && !imagePreview) return;
 
     try {
       await sendMessages({ text: text.trim(), image: imagePreview });

@@ -12,6 +12,7 @@ function Profile() {
     email: authUser.email || "",
     profilePic: authUser.profilePic || "",
   });
+  console.log("🚀 ~ Profile ~ formData:", formData);
   const handleImageUpload = async (e) => {
     e.preventDefault();
     const file = e.target.files[0];
@@ -21,6 +22,7 @@ function Profile() {
     reader.readAsDataURL(file);
     reader.onload = () => {
       const baeseImg = reader.result;
+      console.log("🚀 ~ handleImageUpload ~ baeseImg:", baeseImg);
       setselectedImg(baeseImg);
       setformData((prev) => ({ ...prev, profilePic: baeseImg }));
     };
