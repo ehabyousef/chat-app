@@ -8,6 +8,7 @@ export default function MessageInput() {
   const [imagePreview, setimagePreview] = useState("");
   const { sendMessages, isSendingMessages } = useMessageStore();
   const fileInputRef = useRef(null);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file.type.startsWith("image/")) {

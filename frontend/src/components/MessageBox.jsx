@@ -4,7 +4,7 @@ import ChatHeader from "./ChatHeader";
 import { MessageSkeleton } from "./MessageSkeleton";
 import MessageInput from "./MessageInput";
 import { useAuthStore } from "@/store/useAuthStore";
-import { MessageSquare } from "lucide-react";
+import { Ellipsis, MessageSquare } from "lucide-react";
 
 function MessageBox({ open, selectedUser }) {
   const {
@@ -40,7 +40,7 @@ function MessageBox({ open, selectedUser }) {
     return (
       <div
         className={`h-[calc(100vh-92px)] w-screen ${
-          open ? "md:w-[calc(100vw-256px)]" : "md:w-screen"
+          open ? "md:w-[calc(100vw-25rem)]" : "md:w-screen"
         } transition-all duration-300`}
       >
         <div className="flex flex-col h-full">
@@ -56,7 +56,7 @@ function MessageBox({ open, selectedUser }) {
   return (
     <div
       className={`h-[calc(100vh-92px)] w-screen ${
-        open ? "md:w-[calc(100vw-256px)]" : "md:w-screen"
+        open ? "md:w-[calc(100vw-25rem)]" : "md:w-screen"
       } transition-all duration-300`}
     >
       {!selectedUser || Object.keys(selectedUser).length === 0 ? (
@@ -74,7 +74,7 @@ function MessageBox({ open, selectedUser }) {
           <ChatHeader selectedUser={selectedUser} />
           <div className="flex-1 overflow-hidden">
             <div className="h-full overflow-y-auto p-4 space-y-4">
-              {messages.map((msg) => {
+              {messages?.map((msg) => {
                 // Convert to string for consistent comparison
                 const isMyMessage =
                   String(msg.senderId) === String(authUser._id);
@@ -112,7 +112,9 @@ function MessageBox({ open, selectedUser }) {
                           {new Date(msg?.createdAt).toLocaleTimeString()}
                         </time>
                         <div
-                          className={`w-full flex flex-col gap-4 p-1 rounded-md bg-muted text-foreground`}
+                          className={`relative w-full flex flex-col gap-4 p-1 rounded-md bg-muted text-foreground ${
+                            isMyMessage ? "pl-8" : "pr-10"
+                          } `}
                         >
                           {msg?.image && (
                             <div
@@ -128,6 +130,13 @@ function MessageBox({ open, selectedUser }) {
                             </div>
                           )}
                           {msg?.text && <div>{msg.text}</div>}
+                          <div
+                            className={`absolute ${
+                              isMyMessage ? "left-0.5" : "right-0.5"
+                            } top-0  cursor-pointer px-1`}
+                          >
+                            <Ellipsis size={16} />
+                          </div>
                         </div>
                       </div>
                     </div>

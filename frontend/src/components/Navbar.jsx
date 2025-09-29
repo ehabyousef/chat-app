@@ -64,7 +64,14 @@ const Navbar = () => {
                   <>
                     {usersFollow.map((u) => (
                       <div className="flex w-full justify-between items-center">
-                        <p>{u.fullName}</p>
+                        <div className="size-12 rounded-full flex gap-4 flex-1">
+                          <img
+                            src={u.profilePic}
+                            alt="avatar"
+                            className="rounded-full"
+                          />
+                          <p className="mb-0 content-center">{u.fullName}</p>
+                        </div>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
@@ -87,14 +94,19 @@ const Navbar = () => {
               </div>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-0 lg:gap-2">
             <ThemeToggle />
 
             {authUser && (
               <>
                 <Button variant="ghost" size="sm" asChild>
                   <Link to="/profile">
-                    <User className="size-4" />
+                    {/* <User className="size-4" /> */}
+                    <img
+                      src={authUser.profilePic}
+                      alt="profile"
+                      className="size-4 rounded-full"
+                    />
                     <span className="hidden sm:inline ml-2">Profile</span>
                   </Link>
                 </Button>

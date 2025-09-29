@@ -9,12 +9,23 @@ import { Loader2 } from "lucide-react";
 import Profile from "./pages/Profile";
 import { Toaster } from "react-hot-toast";
 function App() {
-  const { authUser, isCheckingAuth, checkAuth, onlineUsers } = useAuthStore();
+  const { authUser, isCheckingAuth, checkAuth, onlineUsers, startAutoRefresh } =
+    useAuthStore();
   console.log("🚀 ~ App ~ onlineUsers:", onlineUsers);
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  useEffect(() => {
+    let refreshInt;
+    if (authUser) {
+      refreshInt = startAutoRefresh();
+    }
+    return () => {
+      if (refreshInt) clearInterval(refreshInt);
+    };
+  }, [authUser, startAutoRefresh]);
 
   if (isCheckingAuth && !authUser) {
     return (

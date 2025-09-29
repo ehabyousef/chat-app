@@ -42,7 +42,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {filterUsers?.map((user) => (
-                <SidebarMenuItem key={user.fullName}>
+                <SidebarMenuItem className="border-b" key={user.fullName}>
                   <SidebarMenuButton
                     className="flex justify-between items-center gap-3 h-18"
                     isActive={selectedUser?.fullName === user.fullName}
@@ -50,11 +50,11 @@ export function AppSidebar() {
                       setSelectedUser(user);
                     }}
                   >
-                    <div className="w-1/2 h-full relative">
+                    <div className="w-28 h-full relative">
                       <img
                         src={user?.profilePic}
                         alt="avatar"
-                        className="object-cover h-full w-1/2 rounded-xl"
+                        className="object-fill h-full w-1/2 rounded-full"
                       />
                       {onlineUsers.includes(user._id) && (
                         <div className="-bottom-1 -left-1 absolute size-3 rounded-full bg-chart-2" />

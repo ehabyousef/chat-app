@@ -25,7 +25,13 @@ function HomeContent() {
 
 function Home() {
   return (
-    <SidebarProvider className="min-h-0">
+    <SidebarProvider
+      style={{
+        "--sidebar-width": "25rem",
+        "--sidebar-width-mobile": "20rem",
+      }}
+      className="min-h-0"
+    >
       <HomeContent />
     </SidebarProvider>
   );

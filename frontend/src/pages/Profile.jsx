@@ -58,8 +58,8 @@ function Profile() {
   };
 
   return (
-    <div className="h-screen w-screen pt-20">
-      <div className="max-w-2xl mx-auto p-4 py-8">
+    <div className="w-screen pt-8">
+      <div className="max-w-2xl mx-auto p-4 border rounded-xl">
         <div className="bg-base-300 rounded-xl p-6 space-y-8">
           <div className="text-center">
             <h3>Profile</h3>
@@ -109,7 +109,7 @@ function Profile() {
             </p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="form-control">
+            <div className="form-control border-b">
               <label className="label">
                 <span className="label-text font-medium">Full Name</span>
               </label>
@@ -127,7 +127,7 @@ function Profile() {
                 />
               </div>
             </div>
-            <div className="form-control">
+            <div className="form-control border-b">
               <label className="label">
                 <span className="label-text font-medium">Email</span>
               </label>

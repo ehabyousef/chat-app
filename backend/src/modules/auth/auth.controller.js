@@ -80,3 +80,13 @@ export const checkAuth = async (req, res) => {
     res.status(500).json({ message: "internal server error" });
   }
 };
+export const refreshAuth = async (req, res) => {
+  try {
+    const user = req.user;
+
+    generateToken(user._id, res);
+    res.status(200).json(req.user);
+  } catch {
+    res.status(500).json({ message: "Failed to refresh authentication" });
+  }
+};

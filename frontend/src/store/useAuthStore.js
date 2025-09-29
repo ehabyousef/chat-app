@@ -18,17 +18,40 @@ export const useAuthStore = create((set, get) => ({
 
   checkAuth: async () => {
     try {
+      set({ isCheckingAuth: true });
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data });
       get().connectSocket();
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      console.log("cant check", error);
-      set({ authUser: null });
+      try {
+        const refresh = await axiosInstance.post("/auth/refresh");
+        set({ authUser: refresh.data });
+        get().connectSocket();
+        // eslint-disable-next-line no-unused-vars
+      } catch (refError) {
+        set({ authUser: null });
+      }
     } finally {
       set({ isCheckingAuth: false });
     }
   },
 
+  startAutoRefresh: () => {
+    const interval = setInterval(async () => {
+      const { authUser } = get();
+      if (authUser) {
+        try {
+          const res = await axiosInstance.post("/auth/refresh");
+          set({ authUser: res.data });
+          // eslint-disable-next-line no-unused-vars
+        } catch (error) {
+          get().logout();
+        }
+      }
+    }, 0.8 * 60 * 1000); //50 min
+    return interval;
+  },
   signUp: async (data) => {
     try {
       set({ isSigningUp: true });
