@@ -49,3 +49,16 @@ export const sendMessages = async (req, res) => {
     res.status(500).json({ message: "internal server error" });
   }
 };
+
+export const deleteMessage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: "message id is required" });
+    }
+    await Message.findByIdAndDelete(id);
+    res.status(200).json({ message: "message deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "internal server error" });
+  }
+};

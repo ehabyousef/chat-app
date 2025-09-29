@@ -51,19 +51,19 @@ const Navbar = () => {
               placeholder="search by First Name"
             />
             {open && (
-              <div className="absolute flex flex-col space-y-2 -bottom-32 w-full h-32 overflow-y-auto bg-muted-foreground text-forground p-2 rounded-lg">
+              <div className="absolute flex flex-col space-y-2 -bottom-32 w-full h-32 overflow-y-auto bg-muted-foreground text-forground p-2 rounded-lg transition-all duration-200 ease-in-out animate-in slide-in-from-top-2 fade-in-0 scale-in-95">
                 {searching ? (
-                  <div className="text-sm text-muted-foreground p-2">
-                    Searching…
-                  </div>
+                  <div className="text-md text-primary p-2">Searching…</div>
                 ) : usersFollow.length === 0 ? (
-                  <div className="text-sm text-muted-foreground p-2">
-                    No users found
-                  </div>
+                  <div className="text-md text-primary p-2">No users found</div>
                 ) : (
                   <>
-                    {usersFollow.map((u) => (
-                      <div className="flex w-full justify-between items-center">
+                    {usersFollow.map((u, index) => (
+                      <div
+                        key={u._id}
+                        className="flex w-full justify-between items-center animate-in slide-in-from-left-1 fade-in-0"
+                        style={{ animationDelay: `${index * 50}ms` }}
+                      >
                         <div className="size-12 rounded-full flex gap-4 flex-1">
                           <img
                             src={u.profilePic}
@@ -105,7 +105,7 @@ const Navbar = () => {
                     <img
                       src={authUser.profilePic}
                       alt="profile"
-                      className="size-4 rounded-full"
+                      className="size-9 object-contain rounded-full"
                     />
                     <span className="hidden sm:inline ml-2">Profile</span>
                   </Link>

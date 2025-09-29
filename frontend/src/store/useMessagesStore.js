@@ -34,6 +34,7 @@ export const useMessageStore = create((set, get) => ({
       set({ isLoadingMessages: false });
     }
   },
+
   sendMessages: async (data) => {
     const { selectedUser, messages } = get();
     set({ isSendingMessages: true });
@@ -48,6 +49,17 @@ export const useMessageStore = create((set, get) => ({
       toast.error(error.response.data.message);
     } finally {
       set({ isSendingMessages: false });
+    }
+  },
+  deleteMessage: async (id) => {
+    const { messages } = get();
+    try {
+      await axiosInstance.delete(`/messages/${id}`);
+      const newMessages = messages.filter((msg) => msg._id !== id);
+      set({ messages: newMessages });
+      toast.success("message deleted successfully");
+    } catch (error) {
+      toast.error(error.response.data.message);
     }
   },
   subscripeToMessage: () => {

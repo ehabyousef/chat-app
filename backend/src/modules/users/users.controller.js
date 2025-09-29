@@ -46,43 +46,43 @@ export const getSingleuser = async (req, res) => {
   }
 };
 
-export const addFriend = async (req, res) => {
-  try {
-    const { friendId } = req.body;
-    const myId = req.user._id;
-    const me = await User.findById(myId);
-    if (!friendId) {
-      res.status(404).json({ message: "user Id required" });
-    }
-    const isAlreadyFriend = me.friends.some(
-      (x) => x.friendId.toString() === friendId.toString()
-    );
-    if (isAlreadyFriend) {
-      res.status(400).json({ message: "user is already friend" });
-    }
-    await User.findByIdAndUpdate(
-      myId,
-      {
-        $addToSet: {
-          friends: { friendId },
-        },
-      },
-      { new: true }
-    );
-    await User.findByIdAndUpdate(
-      friendId,
-      {
-        $addToSet: {
-          friends: { friendId: myId },
-        },
-      },
-      { new: true }
-    );
-    res.status(200).json({ message: "user add to friends" });
-  } catch (error) {
-    res.status(500).json({ message: "internal server error" });
-  }
-};
+// export const addFriend = async (req, res) => {
+//   try {
+//     const { friendId } = req.body;
+//     const myId = req.user._id;
+//     const me = await User.findById(myId);
+//     if (!friendId) {
+//       res.status(404).json({ message: "user Id required" });
+//     }
+//     const isAlreadyFriend = me.friends.some(
+//       (x) => x.friendId.toString() === friendId.toString()
+//     );
+//     if (isAlreadyFriend) {
+//       res.status(400).json({ message: "user is already friend" });
+//     }
+//     await User.findByIdAndUpdate(
+//       myId,
+//       {
+//         $addToSet: {
+//           friends: { friendId },
+//         },
+//       },
+//       { new: true }
+//     );
+//     await User.findByIdAndUpdate(
+//       friendId,
+//       {
+//         $addToSet: {
+//           friends: { friendId: myId },
+//         },
+//       },
+//       { new: true }
+//     );
+//     res.status(200).json({ message: "user add to friends" });
+//   } catch (error) {
+//     res.status(500).json({ message: "internal server error" });
+//   }
+// };
 
 export const getFriends = async (req, res) => {
   try {
