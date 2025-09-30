@@ -6,7 +6,7 @@ const notificationSchema = new Schema(
     receiverId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     type: {
       type: String,
-      enum: ["friend_request", "friend_accepted", "message"],
+      enum: ["friend_request", "friend_accepted", "friend_rejected", "message"],
       required: true,
     },
     isRead: {

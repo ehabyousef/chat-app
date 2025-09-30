@@ -5,7 +5,7 @@ import {
   protectRoute,
 } from "../../middleware/auth.middleware.js";
 import {
-  addFriend,
+  // addFriend,
   appUsers,
   getFriends,
   getSingleuser,
@@ -23,4 +23,4 @@ userRouter.put(
   Validator(updateProfileValidation),
   updateUserProfile
 );
-userRouter.put("/addFriend", protectRoute, addFriend);
+// userRouter.put("/addFriend", protectRoute, addFriend);

@@ -8,24 +8,21 @@ import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import Profile from "./pages/Profile";
 import { Toaster } from "react-hot-toast";
-function App() {
-  const { authUser, isCheckingAuth, checkAuth, onlineUsers, startAutoRefresh } =
-    useAuthStore();
-  console.log("🚀 ~ App ~ onlineUsers:", onlineUsers);
+import { useNotifcationStore } from "./store/useNotifcationStore";
 
+function App() {
+  const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
+  const { getNotifications } = useNotifcationStore();
+
+  // Check auth on app load
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
-
   useEffect(() => {
-    let refreshInt;
     if (authUser) {
-      refreshInt = startAutoRefresh();
+      getNotifications();
     }
-    return () => {
-      if (refreshInt) clearInterval(refreshInt);
-    };
-  }, [authUser, startAutoRefresh]);
+  }, [authUser, getNotifications]);
 
   if (isCheckingAuth && !authUser) {
     return (
@@ -34,6 +31,7 @@ function App() {
       </div>
     );
   }
+
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors">
       <Navbar />

@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { create } from "zustand";
 import { io } from "socket.io-client";
 import { useMessageStore } from "./useMessagesStore";
+import { useNotifcationStore } from "./useNotifcationStore";
 
 const BASE_URL = "http://localhost:5001";
 export const useAuthStore = create((set, get) => ({
@@ -12,9 +13,9 @@ export const useAuthStore = create((set, get) => ({
   isCheckingAuth: true,
   isUpdatingProfile: false,
   onlineUsers: [],
-  socket: null,
   usersFollow: [],
   searching: false,
+  socket: null,
 
   checkAuth: async () => {
     try {
@@ -22,36 +23,14 @@ export const useAuthStore = create((set, get) => ({
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data });
       get().connectSocket();
-      // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      try {
-        const refresh = await axiosInstance.post("/auth/refresh");
-        set({ authUser: refresh.data });
-        get().connectSocket();
-        // eslint-disable-next-line no-unused-vars
-      } catch (refError) {
-        set({ authUser: null });
-      }
+      console.log("Auth check failed", error);
+      set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
     }
   },
 
-  startAutoRefresh: () => {
-    const interval = setInterval(async () => {
-      const { authUser } = get();
-      if (authUser) {
-        try {
-          const res = await axiosInstance.post("/auth/refresh");
-          set({ authUser: res.data });
-          // eslint-disable-next-line no-unused-vars
-        } catch (error) {
-          get().logout();
-        }
-      }
-    }, 0.8 * 60 * 1000); //50 min
-    return interval;
-  },
   signUp: async (data) => {
     try {
       set({ isSigningUp: true });
@@ -59,6 +38,8 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: res.data });
       toast.success("user created successfully");
       get().connectSocket();
+      const { getFriendsRequests } = useNotifcationStore.getState();
+      getFriendsRequests();
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
@@ -89,7 +70,9 @@ export const useAuthStore = create((set, get) => ({
       toast.success("logged out successfully");
       get().disconnectSocket();
     } catch (error) {
-      toast.error(error.response.data.message);
+      set({ authUser: null });
+      get().disconnectSocket();
+      toast.error(error.response?.data?.message || "Logout failed");
     }
   },
 
@@ -149,6 +132,15 @@ export const useAuthStore = create((set, get) => ({
     set({ socket: socket });
     socket.on("getOnlineUsers", (userIds) => {
       set({ onlineUsers: userIds });
+    });
+
+    socket.on("newNotification", (notif) => {
+      // Update notification store instead of auth store
+      const { notifications } = useNotifcationStore.getState();
+      useNotifcationStore.setState({
+        notifications: [notif, ...notifications],
+      });
+      toast.success(notif.message);
     });
   },
 

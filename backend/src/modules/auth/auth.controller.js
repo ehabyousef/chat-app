@@ -16,21 +16,19 @@ export const register = async (req, res) => {
       fullName,
       password: hash,
     });
-    if (newUser) {
-      await newUser.save();
-      generateToken(newUser._id, res);
 
-      console.log("register: sending response");
-      res.status(201).json({
-        email: newUser.email,
-        fullName: newUser.fullName,
-        profilePic: newUser.profilePic,
-        _id: newUser._id,
-      });
-    }
+    await newUser.save();
+    generateToken(newUser._id, res);
+
+    return res.status(201).json({
+      email: newUser.email,
+      fullName: newUser.fullName,
+      profilePic: newUser.profilePic,
+      _id: newUser._id,
+    });
   } catch (error) {
     console.error(`error in signup controller:`, error);
-    res.status(500).json({ message: "internal server error" });
+    return res.status(500).json({ message: "internal server error" });
   }
 };
 
@@ -40,31 +38,31 @@ export const login = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      res.status(404).json({ message: "no user found" });
+      return res.status(404).json({ message: "no user found" });
     }
     const ispass = await bcrypt.compare(password, user.password);
     if (!ispass) {
-      res.status(400).json({ message: "invalid credentails" });
+      return res.status(400).json({ message: "invalid credentials" });
     }
     generateToken(user._id, res);
-    res.status(200).json({
+    return res.status(200).json({
       fullName: user.fullName,
       email: user.email,
       profilePic: user.profilePic,
       _id: user._id,
     });
   } catch (error) {
-    console.error(`error in signup controller:`, error);
-    res.status(500).json({ message: "internal server error" });
+    console.error(`error in login controller:`, error);
+    return res.status(500).json({ message: "internal server error" });
   }
 };
 
 export const logout = async (req, res) => {
   try {
     res.cookie("jwt", "", { maxAge: 0 });
-    res.status(200).json({ message: "logged out successfully" });
+    return res.status(200).json({ message: "logged out successfully" });
   } catch (error) {
-    res.status(500).json({ message: "internal server error" });
+    return res.status(500).json({ message: "internal server error" });
   }
 };
 
@@ -72,12 +70,12 @@ export const checkAuth = async (req, res) => {
   try {
     const user = req.user;
     if (user) {
-      res.status(200).json(req.user);
+      return res.status(200).json(req.user);
     } else {
-      res.status(401).json({ message: "not authorized" });
+      return res.status(401).json({ message: "not authorized" });
     }
-  } catch {
-    res.status(500).json({ message: "internal server error" });
+  } catch (error) {
+    return res.status(500).json({ message: "internal server error" });
   }
 };
 export const refreshAuth = async (req, res) => {

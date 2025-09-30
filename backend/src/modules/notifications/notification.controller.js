@@ -79,7 +79,7 @@ export const sendFriendRequest = async (req, res) => {
 
 export const respondToFriendRequest = async (req, res) => {
   try {
-    const { requestId, status } = req.body;
+    const { requestId, status, notificationId } = req.body;
     const myId = req.user._id;
 
     if (!["accepted", "rejected"].includes(status)) {
@@ -90,6 +90,7 @@ export const respondToFriendRequest = async (req, res) => {
       "senderId",
       "fullName profilePic"
     );
+
     if (!friendRequest) {
       return res.status(404).json({ message: "Friend request not found" });
     }
@@ -97,7 +98,14 @@ export const respondToFriendRequest = async (req, res) => {
     if (friendRequest.receiverId.toString() !== myId.toString()) {
       return res.status(403).json({ message: "Not authorized" });
     }
+
+    // Update friend request status
     friendRequest.status = status;
+    await friendRequest.save();
+
+    // Get current user info
+    const currentUser = await User.findById(myId);
+
     if (status === "accepted") {
       // Add both users to each other's friends list
       await Promise.all([
@@ -108,24 +116,57 @@ export const respondToFriendRequest = async (req, res) => {
           $addToSet: { friends: { friendId: myId } },
         }),
       ]);
-      const currentUser = await User.findById(myId);
 
-      const notification = new Notification({
-        senderId: myId,
-        receiverId: friendRequest.senderId._id,
-        type: "friend_accepted",
-        message: `${currentUser.fullName} accepted your friend request`,
-      });
+      // Update the original notification type and message
+      let updatedNotification;
+      if (notificationId) {
+        updatedNotification = await Notification.findByIdAndUpdate(
+          notificationId,
+          {
+            type: "friend_accepted",
+            message: `${currentUser.fullName} accepted your friend request`,
+            isRead: true,
+          },
+          { new: true }
+        ).populate("senderId", "fullName profilePic");
+      }
 
-      await notification.save();
-
-      // Send real-time notification
+      // Send real-time notification with updated notification
       const senderSocketId = getReciverSocketId(
         friendRequest.senderId._id.toString()
       );
-      if (senderSocketId) {
-        io.to(senderSocketId).emit("newNotification", {
-          ...notification.toObject(),
+      if (senderSocketId && updatedNotification) {
+        io.to(senderSocketId).emit("notificationUpdated", {
+          ...updatedNotification.toObject(),
+          sender: {
+            _id: currentUser._id,
+            fullName: currentUser.fullName,
+            profilePic: currentUser.profilePic,
+          },
+        });
+      }
+    } else if (status === "rejected") {
+      // Update the original notification type and message
+      let updatedNotification;
+      if (notificationId) {
+        updatedNotification = await Notification.findByIdAndUpdate(
+          notificationId,
+          {
+            type: "friend_rejected",
+            message: `${currentUser.fullName} rejected your friend request`,
+            isRead: true,
+          },
+          { new: true }
+        ).populate("senderId", "fullName profilePic");
+      }
+
+      // Send real-time notification with updated notification
+      const senderSocketId = getReciverSocketId(
+        friendRequest.senderId._id.toString()
+      );
+      if (senderSocketId && updatedNotification) {
+        io.to(senderSocketId).emit("notificationUpdated", {
+          ...updatedNotification.toObject(),
           sender: {
             _id: currentUser._id,
             fullName: currentUser.fullName,
@@ -137,6 +178,7 @@ export const respondToFriendRequest = async (req, res) => {
 
     return res.status(200).json({ message: `Friend request ${status}` });
   } catch (error) {
+    console.error("Respond to friend request error:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -171,5 +213,23 @@ export const getNotifications = async (req, res) => {
     return res.status(200).json(notifications);
   } catch (error) {
     return res.status(500).json({ message: "internal server error" });
+  }
+};
+
+export const getSentRequests = async (req, res) => {
+  try {
+    const myId = req.user._id;
+
+    const sentRequests = await FriendRequest.find({
+      senderId: myId,
+      status: "pending",
+    })
+      .populate("receiverId", "fullName email profilePic")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json(sentRequests);
+  } catch (error) {
+    console.error("Get sent requests error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

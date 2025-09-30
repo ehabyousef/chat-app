@@ -51,6 +51,7 @@ export const useMessageStore = create((set, get) => ({
       set({ isSendingMessages: false });
     }
   },
+
   deleteMessage: async (id) => {
     const { messages } = get();
     try {
@@ -62,6 +63,7 @@ export const useMessageStore = create((set, get) => ({
       toast.error(error.response.data.message);
     }
   },
+
   subscripeToMessage: () => {
     const { selectedUser } = get();
     if (!selectedUser) return;
@@ -72,6 +74,7 @@ export const useMessageStore = create((set, get) => ({
       set({ messages: [...get().messages, newMessage] });
     });
   },
+
   unSubscripeFromMessage: () => {
     const socket = useAuthStore.getState().socket;
     socket.off("newMessage");

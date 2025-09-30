@@ -4,14 +4,14 @@ export const generateToken = (userId, res) => {
   try {
     // Create JWT with correct payload structure
     const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-      expiresIn: "1m",
+      expiresIn: "7d", // 7 days instead of 1 hour
     });
 
     // Set cookie
     res.cookie("jwt", token, {
       httpOnly: true,
-      sameSite: "strict",
-      maxAge: 1 * 60 * 1000, // 30 days
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       secure: process.env.NODE_ENV === "production",
     });
 

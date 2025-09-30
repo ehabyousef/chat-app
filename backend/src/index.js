@@ -8,6 +8,7 @@ import { errorHandler, notFound } from "./middleware/errorhandler.js";
 import { authRouter } from "./modules/auth/auth.route.js";
 import { userRouter } from "./modules/users/users.route.js";
 import { messageRouter } from "./modules/messages/message.route.js";
+import { notificationRouter } from "./modules/notifications/notification.route.js";
 const app = express();
 
 const __dirname = path.resolve();
@@ -23,11 +24,12 @@ app.use(
 app.use(cookieParser());
 // Increase JSON/urlencoded limits (still useful for non-file routes)
 app.use(express.json({ limit: "25mb" }));
-app.use(express.urlencoded({ extended: true, limit: "25mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.static(path.join(__dirname, "../images")));
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
 app.use("/api/messages", messageRouter);
+app.use("/api/notifications", notificationRouter);
 app.use(notFound);
 app.use(errorHandler);
 export default app;
