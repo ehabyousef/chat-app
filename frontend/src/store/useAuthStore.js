@@ -69,6 +69,8 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: null });
       toast.success("logged out successfully");
       get().disconnectSocket();
+      const { nullSelectedUser } = useMessageStore.getState();
+      nullSelectedUser();
     } catch (error) {
       set({ authUser: null });
       get().disconnectSocket();

@@ -54,7 +54,7 @@ export function AppSidebar() {
                       <img
                         src={user?.profilePic}
                         alt="avatar"
-                        className="object-fill h-full w-1/2 rounded-full"
+                        className="rounded-full object-cover ring-2 ring-background shadow-sm h-full w-1/2 "
                       />
                       {onlineUsers.includes(user._id) && (
                         <div className="-bottom-1 -left-1 absolute size-3 rounded-full bg-chart-2" />

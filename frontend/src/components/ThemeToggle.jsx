@@ -49,13 +49,13 @@ export function ThemeToggle() {
         <DropdownMenuSeparator />
         <DropdownMenuLabel>Color Themes</DropdownMenuLabel>
 
-        <DropdownMenuItem
+        {/* <DropdownMenuItem
           onClick={() => setTheme("red")}
           className={theme === "red" ? "bg-accent" : ""}
         >
           <div className="mr-2 h-4 w-4 rounded-full bg-red-500" />
           Red Theme
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
 
         <DropdownMenuItem
           onClick={() => setTheme("blue")}

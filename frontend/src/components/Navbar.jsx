@@ -12,7 +12,6 @@ import {
   XCircle,
 } from "lucide-react";
 import { Input } from "./ui/input";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { useEffect, useRef, useState } from "react";
 import { useNotifcationStore } from "@/store/useNotifcationStore";
 import {
@@ -31,14 +30,30 @@ const Navbar = () => {
     getNotifications,
     notifications,
     respondRequest,
-    sentRequests, // Use sentRequests instead of friendRequests
+    sentRequests,
     getSentRequests,
   } = useNotifcationStore();
-  
+
   const { requestFriend } = useNotifcationStore();
   const [query, setquery] = useState("");
   const [open, setopen] = useState(false);
   const debRef = useRef();
+
+  // Reset query when user logs out or component mounts
+  useEffect(() => {
+    if (!authUser) {
+      setquery("");
+      setopen(false);
+    }
+  }, [authUser]);
+
+  // Only fetch data when user is authenticated
+  useEffect(() => {
+    if (authUser) {
+      getNotifications();
+      getSentRequests();
+    }
+  }, [getNotifications, getSentRequests, authUser]);
 
   const handleChange = (e) => {
     const val = e.target.value;
@@ -51,10 +66,12 @@ const Navbar = () => {
     }, 300);
   };
 
-  useEffect(() => {
-    getNotifications();
-    getSentRequests(); // Get sent requests on component mount
-  }, [getNotifications, getSentRequests]);
+  // Clear search when clicking outside or when input loses focus
+  const handleBlur = () => {
+    setTimeout(() => {
+      setopen(false);
+    }, 200); // Small delay to allow clicks on search results
+  };
 
   const handleRespond = (e, requestId, status, notificationId) => {
     e.preventDefault();
@@ -102,61 +119,140 @@ const Navbar = () => {
               <Input
                 value={query}
                 onChange={handleChange}
+                // onBlur={handleBlur}
                 type="text"
                 placeholder="search by First Name"
               />
               {open && (
-                <div className="absolute flex flex-col space-y-2 -bottom-32 w-full h-32 overflow-y-auto bg-muted-foreground text-forground p-2 rounded-lg transition-all duration-200 ease-in-out animate-in slide-in-from-top-2 fade-in-0 scale-in-95">
+                <div className="absolute top-full mt-2 w-full max-h-80 overflow-y-auto bg-background/80 backdrop-blur-md border border-border/50 rounded-xl shadow-2xl transition-all duration-300 ease-out animate-in slide-in-from-top-2 fade-in-0 scale-in-95 z-50">
                   {searching ? (
-                    <div className="text-md text-primary p-2">Searching…</div>
+                    <div className="flex items-center justify-center py-8">
+                      <div className="flex items-center gap-3 text-muted-foreground">
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+                        <span className="text-sm font-medium">
+                          Searching users...
+                        </span>
+                      </div>
+                    </div>
                   ) : usersFollow.length === 0 ? (
-                    <div className="text-md text-primary p-2">
-                      No users found
+                    <div className="flex flex-col items-center justify-center py-8 px-4">
+                      <div className="text-muted-foreground/60 mb-2">
+                        <svg
+                          className="w-8 h-8"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.5}
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-sm font-medium text-muted-foreground">
+                        No users found
+                      </span>
+                      <span className="text-xs text-muted-foreground/60 mt-1">
+                        Try a different search term
+                      </span>
                     </div>
                   ) : (
-                    <>
-                      {usersFollow.map((u, index) => (
-                        <div
-                          key={u._id}
-                          className="flex w-full justify-between items-center animate-in slide-in-from-left-1 fade-in-0"
-                          style={{ animationDelay: `${index * 50}ms` }}
-                        >
-                          <div className="size-12 rounded-full flex gap-4 flex-1">
-                            <img
-                              src={u.profilePic}
-                              alt="avatar"
-                              className="rounded-full"
-                            />
-                            <p className="mb-0 content-center">{u.fullName}</p>
+                    <div className="p-2">
+                      <div className="text-xs font-semibold text-muted-foreground/80 px-3 py-2 border-b border-border/30">
+                        Search Results ({usersFollow.length})
+                      </div>
+                      <div className="space-y-1 mt-2">
+                        {usersFollow.map((u, index) => (
+                          <div
+                            key={u._id}
+                            className="group flex w-full justify-between items-center p-3 rounded-lg hover:bg-muted/50 transition-all duration-200 animate-in slide-in-from-left-1 fade-in-0 border border-transparent hover:border-border/30"
+                            style={{ animationDelay: `${index * 50}ms` }}
+                          >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <div className="relative">
+                                <img
+                                  src={u.profilePic}
+                                  alt="avatar"
+                                  className="size-10 rounded-full object-cover ring-2 ring-background shadow-sm group-hover:ring-primary/20 transition-all duration-200"
+                                />
+                                <div className="absolute -bottom-0.5 -right-0.5 size-3 bg-green-500 rounded-full border-2 border-background shadow-sm"></div>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors duration-200">
+                                  {u.fullName}
+                                </p>
+                                <p className="text-xs text-muted-foreground truncate">
+                                  @{u.email?.split("@")[0] || "user"}
+                                </p>
+                              </div>
+                            </div>
+
+                            <Button
+                              onClick={() => {
+                                requestFriend(u._id);
+                              }}
+                              variant={
+                                sentRequests.includes(u._id)
+                                  ? "outline"
+                                  : "default"
+                              }
+                              size="sm"
+                              disabled={sentRequests.includes(u._id)}
+                              className={`
+                                ml-3 shrink-0 transition-all duration-200 shadow-sm
+                                ${
+                                  sentRequests.includes(u._id)
+                                    ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-50 dark:bg-green-950 dark:text-green-400 dark:border-green-800"
+                                    : "hover:shadow-md hover:scale-105"
+                                }
+                              `}
+                            >
+                              {sentRequests.includes(u._id) ? (
+                                <>
+                                  <svg
+                                    className="w-3 h-3 mr-1.5"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                  Sent
+                                </>
+                              ) : (
+                                <>
+                                  <svg
+                                    className="w-3 h-3 mr-1.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M12 4v16m8-8H4"
+                                    />
+                                  </svg>
+                                  Add Friend
+                                </>
+                              )}
+                            </Button>
                           </div>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                onClick={() => {
-                                  requestFriend(u._id);
-                                }}
-                                variant="secondary"
-                                disabled={sentRequests.includes(u._id)} // Disable if already sent
-                              >
-                                {sentRequests.includes(u._id)
-                                  ? "Request Sent"
-                                  : "Send Request"}
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {sentRequests.includes(u._id)
-                                ? "Friend request already sent"
-                                : "Send friend request"}
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
-                      ))}
-                    </>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
               )}
             </div>
           )}
+
           <div className="flex items-center gap-0 lg:gap-2">
             <ThemeToggle />
 

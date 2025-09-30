@@ -46,10 +46,10 @@ export function ThemeProvider({
       return;
     }
 
-    if (theme === "red") {
-      root.classList.add("theme-red");
-      return;
-    }
+    // if (theme === "red") {
+    //   root.classList.add("theme-red");
+    //   return;
+    // }
 
     if (theme === "blue") {
       root.classList.add("theme-blue");

@@ -6,6 +6,9 @@ import { getReciverSocketId, io } from "../../utils/socket.js";
 // send FriendRequest
 export const sendFriendRequest = async (req, res) => {
   try {
+    console.log("Send friend request - Body:", req.body);
+    console.log("Send friend request - User ID:", req.user?._id);
+
     const { friendId } = req.body;
     const myId = req.user._id;
 
@@ -18,7 +21,18 @@ export const sendFriendRequest = async (req, res) => {
         .status(400)
         .json({ message: "Cannot send friend request to yourself" });
     }
+
     const me = await User.findById(myId);
+    if (!me) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const friend = await User.findById(friendId);
+    if (!friend) {
+      return res.status(404).json({ message: "Friend not found" });
+    }
+
+    // Check if already friends
     const isAlready = me.friends.some(
       (x) => x.friendId.toString() === friendId.toString()
     );
@@ -27,16 +41,31 @@ export const sendFriendRequest = async (req, res) => {
       return res.status(400).json({ message: "Already friends" });
     }
 
-    const exist = await FriendRequest.findOne({
+    // Only check for PENDING friend requests, ignore rejected ones
+    const existingPendingRequest = await FriendRequest.findOne({
       $or: [
         { senderId: myId, receiverId: friendId },
         { senderId: friendId, receiverId: myId },
       ],
+      status: "pending", // Only check for pending requests
     });
-    if (exist) {
-      return res.status(400).json({ message: "Friend request already exists" });
+
+    if (existingPendingRequest) {
+      return res
+        .status(400)
+        .json({ message: "Friend request already pending" });
     }
 
+    // Check if there's a previous rejected request and delete it
+    await FriendRequest.deleteMany({
+      $or: [
+        { senderId: myId, receiverId: friendId },
+        { senderId: friendId, receiverId: myId },
+      ],
+      status: "rejected", // Delete old rejected requests
+    });
+
+    // Create new friend request
     const friendRequest = new FriendRequest({
       senderId: myId,
       receiverId: friendId,
@@ -44,21 +73,21 @@ export const sendFriendRequest = async (req, res) => {
 
     await friendRequest.save();
 
-    //create notification
+    // Create notification
     const notification = new Notification({
       senderId: myId,
       receiverId: friendId,
       type: "friend_request",
-      message: `${me.fullName} send you friend request`,
+      message: `${me.fullName} sent you a friend request`,
       data: { friendRequestId: friendRequest._id },
     });
 
     await notification.save();
 
-    //send real time notification
-    const reciveSocket = getReciverSocketId(friendId);
-    if (reciveSocket) {
-      io.to(reciveSocket).emit("newNotification", {
+    // Send real-time notification
+    const receiveSocket = getReciverSocketId(friendId);
+    if (receiveSocket) {
+      io.to(receiveSocket).emit("newNotification", {
         ...notification.toObject(),
         sender: {
           _id: me._id,
@@ -73,7 +102,12 @@ export const sendFriendRequest = async (req, res) => {
       friendRequest,
     });
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
+    console.error("Send friend request error:", error);
+    console.error("Error stack:", error.stack);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
   }
 };
 
