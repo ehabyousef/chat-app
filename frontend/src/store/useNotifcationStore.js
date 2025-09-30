@@ -86,4 +86,20 @@ export const useNotifcationStore = create((set, get) => ({
       console.error("Get sent requests error:", error);
     }
   },
+
+  markNotificationRead: async (notificationId) => {
+    try {
+      await axiosInstance.put(`/notifications/${notificationId}/markRead`);
+
+      set((state) => ({
+        notifications: state.notifications.map((notif) =>
+          notif._id === notificationId ? { ...notif, isRead: true } : notif
+        ),
+      }));
+    } catch (error) {
+      toast.error(
+        error.response.data.message || "Failed to mark notification as read"
+      );
+    }
+  },
 }));

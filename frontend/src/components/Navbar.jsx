@@ -34,7 +34,7 @@ const Navbar = () => {
     getSentRequests,
   } = useNotifcationStore();
 
-  const { requestFriend } = useNotifcationStore();
+  const { requestFriend, markNotificationRead } = useNotifcationStore();
   const [query, setquery] = useState("");
   const [open, setopen] = useState(false);
   const debRef = useRef();
@@ -268,8 +268,6 @@ const Navbar = () => {
                     <span className="hidden sm:inline ml-2">Profile</span>
                   </Link>
                 </Button>
-
-                {/* Remove manual state management */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="relative">
@@ -302,7 +300,10 @@ const Navbar = () => {
                             className="flex flex-col items-start gap-2 p-3 cursor-default"
                             onSelect={(e) => e.preventDefault()}
                           >
-                            <div className="flex items-start gap-3 w-full">
+                            <div
+                              onClick={() => markNotificationRead(notif._id)}
+                              className="flex items-start gap-3 w-full cursor-pointer"
+                            >
                               <img
                                 src={
                                   notif.senderId?.profilePic || "/avatar.jpg"

@@ -1,4 +1,6 @@
 import { Message } from "../../DB/models/message.model.js";
+import { Notification } from "../../DB/models/notification.model.js";
+import User from "../../DB/models/user.model.js";
 import cloudinary from "../../utils/cloudinary.js";
 import { getReciverSocketId, io } from "../../utils/socket.js";
 
@@ -44,9 +46,34 @@ export const sendMessages = async (req, res) => {
     if (reciverId) {
       io.to(reciverId).emit("newMessage", sendMsg);
     }
-    res.status(201).json(sendMsg);
+    const currentUser = await User.findById(myId);
+
+    const notification = new Notification({
+      senderId: myId,
+      receiverId: userChatID,
+      type: "message",
+      data: { messageId: sendMsg._id },
+      message: `new message from ${currentUser.fullName}`,
+    });
+
+    await notification.save();
+
+    // send real time notification
+    const recive = getReciverSocketId(userChatID);
+    if (recive) {
+      io.to(recive).emit("newNotification", {
+        ...notification.toObject(),
+        sender: {
+          _id: currentUser._id,
+          fullName: currentUser.fullName,
+          profilePic: currentUser.profilePic,
+        },
+      });
+    }
+
+    return res.status(201).json(sendMsg);
   } catch (error) {
-    res.status(500).json({ message: "internal server error" });
+    return res.status(500).json({ message: "internal server error" });
   }
 };
 

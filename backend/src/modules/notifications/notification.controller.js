@@ -267,3 +267,33 @@ export const getSentRequests = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const readNotification = async (req, res) => {
+  try {
+    const { notificationId } = req.params;
+    const myId = req.user._id;
+
+    if (!notificationId) {
+      return res.status(400).json({ message: "Notification ID is required" });
+    }
+
+    const notification = await Notification.findByIdAndUpdate(
+      {
+        _id: notificationId,
+        receiverId: myId,
+      },
+      { isRead: true },
+      { new: true }
+    ).populate("senderId", "fullName profilePic");
+
+    if (!notification) {
+      return res.status(404).json({ message: "Notification not found" });
+    }
+    return res.status(200).json({
+      message: "Notification marked as read",
+      notification,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
