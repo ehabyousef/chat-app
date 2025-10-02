@@ -70,7 +70,8 @@ const Navbar = () => {
   const handleBlur = () => {
     setTimeout(() => {
       setopen(false);
-    }, 200); // Small delay to allow clicks on search results
+      setquery("");
+    }, 800); // Small delay to allow clicks on search results
   };
 
   const handleRespond = (e, requestId, status, notificationId) => {
@@ -119,7 +120,7 @@ const Navbar = () => {
               <Input
                 value={query}
                 onChange={handleChange}
-                // onBlur={handleBlur}
+                onBlur={handleBlur}
                 type="text"
                 placeholder="search by First Name"
               />
@@ -177,7 +178,6 @@ const Navbar = () => {
                                   alt="avatar"
                                   className="size-10 rounded-full object-cover ring-2 ring-background shadow-sm group-hover:ring-primary/20 transition-all duration-200"
                                 />
-                                <div className="absolute -bottom-0.5 -right-0.5 size-3 bg-green-500 rounded-full border-2 border-background shadow-sm"></div>
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors duration-200">
